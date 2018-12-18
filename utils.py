@@ -2,8 +2,8 @@
 import pickle as pkl
 import pdb
 import urllib.request
-import io
-from lxml import html
+#import io
+#from lxml import html
 import requests
 from bs4 import BeautifulSoup
 import re
@@ -16,7 +16,7 @@ def datascraping(page):
    #print (page.status_code)
    soup = BeautifulSoup(page.content, 'html.parser')
 #print(soup.prettify())
-   html_classes = ["paragraph", "subsection", "definition", "Pnote", "Ydefinition", "Ysubsection", "subpara", "subsubpara","section"]
+   html_classes = ["paragraph", "subsection", "definition", "Pnote", "Yheadnote", "Ydefinition", "Ysection", "Yparagraph","Ysubsection", "Ysubpara","Ysubsubpara","Yclause", "Yfirstdef","subsubpara","section"]
    dict_soup_obj = {}
    corpus_dict = {}
 
@@ -42,6 +42,7 @@ def remove_html_tags(corpus, to_be_removed):
          corpus[html_class][idx] = re.sub(to_be_removed, '',corpus[html_class][idx])
    return corpus 
 
+'''
 all_data = datascraping(page)
 all_data_with_no_tags = remove_html_tags(all_data, to_be_removed)
-pdb.set_trace()
+'''
