@@ -40,14 +40,13 @@ def get_textbody_per_page(corpus):
     return text
 
 nlp = spacy.load("en_core_web_lg")
-def calc_sentence_similarity(textbody):#, textbody2 = None):#here textbody is a list of sentences
+def calc_sentence_similarity(textbody, textbody2):#here textbody is a list of sentences
     similarity_score = {}
     #similarity_score2 = []
-    for i in tqdm(range(10000)):
-        for idx1 in range(50):#len(textbody)):
-            for idx2 in range(50):#len(textbody)):
-            #similarity_score.append(nlp(textbody[idx1]).similarity(nlp(textbody[idx2])))
-                similarity_score[(idx1, idx2)] = nlp(textbody[idx1]).similarity(nlp(textbody[idx2]))
+    for idx1 in tqdm(range(50)):#len(textbody)):
+        for idx2 in range(50):#len(textbody)):
+        #similarity_score.append(nlp(textbody[idx1]).similarity(nlp(textbody[idx2])))
+            similarity_score[(idx1, idx2)] = nlp(textbody[idx1]).similarity(nlp(textbody2[idx2]))
     '''
     else:
         for idx1 in range(50):#len(textbody)):
@@ -74,7 +73,7 @@ print (count_words(corpus2, words))
 climate_act_text = get_textbody_per_page(corpus2)
 
 #calculate similarity between each sentence in electricity act
-score1 = calc_sentence_similarity(electricity_act_text)
+score1 = calc_sentence_similarity(electricity_act_text,electricity_act_text)
 score2 = calc_sentence_similarity(electricity_act_text,climate_act_text )
 pkl.dump( score1, open( "savesamescore.p", "wb" ) )
 pkl.dump(score2, open("savediffscore.p","wb"))
