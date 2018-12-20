@@ -7,6 +7,8 @@ import nltk, string
 nltk.download('stopwords')
 nltk.download('punkt')
 from nltk.tokenize import word_tokenize
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 def count_words(corpus, words):
     count = {}
@@ -40,23 +42,26 @@ def get_textbody_per_page(corpus):
 nlp = spacy.load("en_core_web_lg")
 def calc_sentence_similarity(textbody, textbody2, no_of_sentences = None):#here textbody is a list of sentences
     similarity_score = {}
-
     if no_of_sentences is None:
         no_of_sentences_1 = len(textbody)
         no_of_sentences_2 = len(textbod2)
+        itr1 = range(len(textbody))
+        itr2 = range(len(textbody2))
     else: #pick some random sentences
         no_of_sentences_1 = no_of_sentences
         no_of_sentences_2 = no_of_sentences
-        textbody = [str(i) for i in np.random.choice(textbody, no_of_sentences_1, replace=False)]
-        textbody2 = [str(i) for i in np.random.choice(textbody2, no_of_sentences_2, replace=False)]
+        tmp = list(range(len(textbody)))
+        np.random.shuffle(tmp)
+        itr1 = tmp[:no_of_sentences_1]
+        tmp = list(range(len(textbody2)))
+        np.random.shuffle(tmp)
+        itr2 = tmp[:no_of_sentences_2]
 
-    for idx1 in tqdm(range(len(textbody))):  # len(textbody)):
-        for idx2 in range(len(textbody2)):  # len(textbody)):
+    for idx1 in tqdm(itr1):  # len(textbody)):
+        for idx2 in itr2:  # len(textbody)):
             # similarity_score.append(nlp(textbody[idx1]).similarity(nlp(textbody[idx2])))
             similarity_score[(idx1, idx2)] = nlp(textbody[idx1]).similarity(nlp(textbody2[idx2]))
-    pdb.set_trace()
     return similarity_score
-
 
 
 def preprocessing(text):
@@ -80,7 +85,8 @@ def preprocessing(text):
     for idx in range(len(tokenized_sents)):
         tokenized_sents[idx] = " ".join(tokenized_sents[idx]).strip(" ")
     return tokenized_sents #this is the processed list of text from an html page
-    
+
+
 #get all the text from electricity act
 page = requests.get("https://www.ontario.ca/laws/statute/98e15#BK1")
 to_be_removed = re.compile('<.*?>')
@@ -102,13 +108,21 @@ cleaned_climate_act_text = preprocessing(climate_act_text)
 
 
 #calculate similarity between each sentence in electricity act
-score1 = calc_sentence_similarity(cleaned_electricity_act_text, cleaned_electricity_act_text, 200)
+score1 = calc_sentence_similarity(cleaned_electricity_act_text, cleaned_electricity_act_text, 10)
 #print (score1)
 #pdb.set_trace()
-score2 = calc_sentence_similarity(electricity_act_text, climate_act_text, 200)
+score2 = calc_sentence_similarity(electricity_act_text, climate_act_text, 10)
 #print (score1)
 #print (score2)
-pkl.dump( score1, open( "savesamescore.p", "wb" ) )
-pkl.dump(score2, open("savediffscore.p","wb"))
+pkl.dump(score1, open("savesamescore.p", "wb"))
+pkl.dump(score2, open("savediffscore.p", "wb"))
+fig, ax = plt.subplots()
+for a in [list(score1.values()), list(score2.values())]:
+    sns.distplot(a, ax=ax, kde=False)
+ax.set_xlim([0, 1])
+plt.show()
 pdb.set_trace()
+
+
+#TODO clean up french parts
 
