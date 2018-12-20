@@ -103,19 +103,21 @@ if __name__ == "__main__":
 
 
     #calculate similarity between each sentence in electricity act
-    score1 = calc_sentence_similarity(electricity_text, electricity_text, 50)
-    score2 = calc_sentence_similarity(electricity_text, climate_text, 50)
-    score3 = calc_sentence_similarity(climate_text, climate_text, 50)
+    score1 = calc_sentence_similarity(electricity_text, electricity_text, 10)
+    score2 = calc_sentence_similarity(electricity_text, climate_text, 10)
+    score3 = calc_sentence_similarity(climate_text, climate_text, 10)
     pkl.dump(score1, open("e_e.p", "wb"))
     pkl.dump(score2, open("e_c.p", "wb"))
     pkl.dump(score3, open("c_c.p", "wb"))
     fig, ax = plt.subplots()
-    for color, data in zip(['r', 'g', 'b'], [list(score1.values()), list(score2.values()), list(score3.values())]):
-        sns.distplot(data, ax=ax, kde=False, color=color)
+    for label, color, data in zip(['E vs E', 'E vs C', 'C vs C'], ['r', 'g', 'b'], [list(score1.values()), list(score2.values()), list(score3.values())]):
+        sns.distplot(data, ax=ax, kde=True, color=color, label=label)
     ax.set_xlim([0, 1])
+    plt.legend()
     plt.show()
     pdb.set_trace()
 
 
     #TODO clean up french parts
+    #https://github.com/RaRe-Technologies/gensim/blob/develop/docs/notebooks/doc2vec-lee.ipynb
 
