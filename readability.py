@@ -1,4 +1,4 @@
-import spacy 
+import spacy, tqdm
 from textstat.textstat import textstatistics, easy_word_set, legacy_round 
 from process import *
 
@@ -28,8 +28,7 @@ def avg_sentence_length(text):
     words = word_count(text) 
     sentences = sentence_count(text) 
     average_sentence_length = float(words / sentences) 
-    print ()
-    return average_sentence_length 
+    return average_sentence_length
   
 # Textstat is a python package, to calculate statistics from  
 # text to determine readability,  
@@ -75,11 +74,10 @@ def poly_syllable_count(text):
     words = [] 
     sentences = break_sentences(text) 
     for sentence in sentences: 
-        words += [token for token in sentence] 
-      
+        words += [token for token in sentence]
   
-    for word in words: 
-        syllable_count = syllables_count(word) 
+    for word in words:
+        syllable_count = syllables_count(str(word))
         if syllable_count >= 3: 
             count += 1
     return count 
@@ -112,8 +110,8 @@ def smog_index(text):
           than two syllables in a sample of 30 sentences. 
     """
   
-    if sentence_count(text) >= 3: 
-        poly_syllab = poly_syllable_count(text) 
+    if sentence_count(text) >= 3:
+        poly_syllab = poly_syllable_count(text)
         SMOG = (1.043 * (30*(poly_syllab / sentence_count(text)))**0.5)+ 3.1291
         return legacy_round(SMOG, 1) 
     else: 
@@ -129,8 +127,8 @@ def dale_chall_readability_score(text):
             ASL = Average sentence length 
     """
     words = word_count(text) 
-    # Number of words not termed as difficult words 
-    count = word_count - difficult_words(text) 
+    # Number of words not termed as difficult words
+    count = words - difficult_words(text)
     if words > 0: 
   
         # Percentage of words not on difficult word list 
@@ -150,25 +148,15 @@ def dale_chall_readability_score(text):
   
         raw_score += 3.6365
           
-    return legacy_round(score, 2)
-def get_score(sentences, word_req):
-    req_sents = []
-    metric = {0:'flesch_reading_ease',1:'gunning_fog',2:'smog_index',3:'dale_chall_readability_score'} 
+    return legacy_round(raw_score, 2)
+def get_score(sentences):
+    metric = [flesch_reading_ease, gunning_fog, smog_index, dale_chall_readability_score]
     score = {}
 
-    for word in sentences:
-        print (word)
-        if word == word_req:
-            print (1)
-            for sen in sentences[word]:
-                req_sents.append(sen)
-    for i in metric:
-        for idx in range(len(req_sents)):
-            score[(i,idx)] = helper(req_sents[idx], metric[i])
-
-#metric = {0:'flesch_reading_ease',1:'gunning_fog',2:'smog_index',3:'dale_chall_readability_score'} 
-def helper(sentences, metric):
-    return metric(sentence)
+    for idx in tqdm(range(len(sentences))):
+        for m in range(len(metric)):
+            score[(m, idx)] = metric[m](sentences[idx])
+    return score
 
 page = requests.get("https://www.ontario.ca/laws/statute/98e15#BK1")
 to_be_removed = re.compile('<.*?>')
@@ -177,29 +165,10 @@ corpus = remove_html_tags(all_data, to_be_removed)
 words = ['comply', 'shall', 'must', 'oblige']
 #print (count_words(corpus,words))
 sentence_dict_byword = get_sentences(corpus, words)
-get_score(sentence_dict_byword, 'comply')
+get_score(sentence_dict_byword['comply'])
 electricity_act_text = get_textbody_per_page(corpus)
+pdb.set_trace()
+print("Bye")
 #break_sentences(electricity_act_text)
 #text = "If you like GeeksforGeeks and would like to contribute, you can also write an article using contribute.geeksforgeeks.org or mail your article to contribute@geeksforgeeks.org. See your article appearing on the GeeksforGeeks main page and help other Geeks"
 #text = "Mary had a little lamp."
-'''
-for idx in range(50):
-    pdb.set_trace()
-    print (flesch_reading_ease(electricity_act_text[idx]))
-'''
-'''
-def get_score(sentences, word_req):
-    req_sents = []
-    metric = {0:'flesch_reading_ease',1:'gunning_fog',2:'smog_index',3:'dale_chall_readability_score'} 
-    score = {}
-    for word in sentences:
-        if word = word_req:
-            req_sents.append(sentences[word])
-    for i in metric:
-        for idx in range(len(req_sents)):
-            score[(i,idx)] = helper(req_sents[idx], metric[i])
-
-#metric = {0:'flesch_reading_ease',1:'gunning_fog',2:'smog_index',3:'dale_chall_readability_score'} 
-def helper(sentences, metric):
-    return metric(sentence)
-'''
