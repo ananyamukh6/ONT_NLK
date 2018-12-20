@@ -38,22 +38,23 @@ def get_textbody_per_page(corpus):
     return text
 
 nlp = spacy.load("en_core_web_lg")
-def calc_sentence_similarity(textbody, textbody2,no_of_sentences = None):#here textbody is a list of sentences
+def calc_sentence_similarity(textbody, textbody2, no_of_sentences = None):#here textbody is a list of sentences
     similarity_score = {}
+
     if no_of_sentences is None:
-        for idx1 in tqdm(range(len(textbody))):#len(textbody)):
-            for idx2 in range(len(textbody2)):#len(textbody)):
-            #similarity_score.append(nlp(textbody[idx1]).similarity(nlp(textbody[idx2])))
-                similarity_score[(idx1, idx2)] = nlp(textbody[idx1]).similarity(nlp(textbody2[idx2]))
-    else:
-        text1 = str(np.random.choice(textbody, no_of_sentences, replace = False))
-        text2 = str(np.random.choice(textbody2, no_of_sentences, replace = False))
-        #pdb.set_trace()
-        for idx1 in tqdm(range(no_of_sentences)):#len(textbody)):
-            for idx2 in range(no_of_sentences):#len(textbody)):
-            #similarity_score.append(nlp(textbody[idx1]).similarity(nlp(textbody[idx2])))
-                similarity_score[(idx1, idx2)] = nlp(text1[idx1]).similarity(nlp(text2[idx2]))
-    #pdb.set_trace()
+        no_of_sentences_1 = len(textbody)
+        no_of_sentences_2 = len(textbod2)
+    else: #pick some random sentences
+        no_of_sentences_1 = no_of_sentences
+        no_of_sentences_2 = no_of_sentences
+        textbody = [str(i) for i in np.random.choice(textbody, no_of_sentences_1, replace=False)]
+        textbody2 = [str(i) for i in np.random.choice(textbody2, no_of_sentences_2, replace=False)]
+
+    for idx1 in tqdm(range(len(textbody))):  # len(textbody)):
+        for idx2 in range(len(textbody2)):  # len(textbody)):
+            # similarity_score.append(nlp(textbody[idx1]).similarity(nlp(textbody[idx2])))
+            similarity_score[(idx1, idx2)] = nlp(textbody[idx1]).similarity(nlp(textbody2[idx2]))
+    pdb.set_trace()
     return similarity_score
 
 
@@ -86,7 +87,7 @@ to_be_removed = re.compile('<.*?>')
 all_data = datascraping(page)
 corpus = remove_html_tags(all_data, to_be_removed)
 words = ['comply', 'shall', 'must', 'oblige']
-print (count_words(corpus,words))
+print (count_words(corpus, words))
 electricity_act_text = get_textbody_per_page(corpus)
 #pdb.set_trace()
 cleaned_electricity_act_text = preprocessing(electricity_act_text)
@@ -101,10 +102,10 @@ cleaned_climate_act_text = preprocessing(climate_act_text)
 
 
 #calculate similarity between each sentence in electricity act
-score1 = calc_sentence_similarity(cleaned_electricity_act_text,cleaned_electricity_act_text, 200)
+score1 = calc_sentence_similarity(cleaned_electricity_act_text, cleaned_electricity_act_text, 200)
 #print (score1)
 #pdb.set_trace()
-score2 = calc_sentence_similarity(electricity_act_text,climate_act_text,200 )
+score2 = calc_sentence_similarity(electricity_act_text, climate_act_text, 200)
 #print (score1)
 #print (score2)
 pkl.dump( score1, open( "savesamescore.p", "wb" ) )
