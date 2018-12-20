@@ -165,7 +165,7 @@ corpus = remove_html_tags(all_data, to_be_removed)
 words = ['comply', 'shall', 'must', 'oblige']
 #print (count_words(corpus,words))
 sentence_dict_byword = get_sentences(corpus, words)
-get_score(sentence_dict_byword['comply'])
+comply_sent_scores = get_score(sentence_dict_byword['comply'])
 electricity_act_text = get_textbody_per_page(corpus)
 pdb.set_trace()
 print("Bye")
