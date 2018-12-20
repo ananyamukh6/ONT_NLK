@@ -87,42 +87,44 @@ def preprocessing(text):
     return tokenized_sents #this is the processed list of text from an html page
 
 
-#get all the text from electricity act
-page = requests.get("https://www.ontario.ca/laws/statute/98e15#BK1")
-to_be_removed = re.compile('<.*?>')
-all_data = datascraping(page)
-corpus = remove_html_tags(all_data, to_be_removed)
-words = ['comply', 'shall', 'must', 'oblige']
-print (count_words(corpus, words))
-electricity_act_text = get_textbody_per_page(corpus)
-#pdb.set_trace()
-cleaned_electricity_act_text = preprocessing(electricity_act_text)
 
-#get all the text from climate act
-page2 = requests.get("https://www.ontario.ca/laws/statute/16c07")
-all_data2 = datascraping(page2)
-corpus2 = remove_html_tags(all_data2, to_be_removed)
-print (count_words(corpus2, words))
-climate_act_text = get_textbody_per_page(corpus2)
-cleaned_climate_act_text = preprocessing(climate_act_text)
+if __name__ == "__main__":
+    #get all the text from electricity act
+    page = requests.get("https://www.ontario.ca/laws/statute/98e15#BK1")
+    to_be_removed = re.compile('<.*?>')
+    all_data = datascraping(page)
+    corpus = remove_html_tags(all_data, to_be_removed)
+    words = ['comply', 'shall', 'must', 'oblige']
+    print (count_words(corpus, words))
+    electricity_act_text = get_textbody_per_page(corpus)
+    #pdb.set_trace()
+    cleaned_electricity_act_text = preprocessing(electricity_act_text)
 
-
-#calculate similarity between each sentence in electricity act
-score1 = calc_sentence_similarity(cleaned_electricity_act_text, cleaned_electricity_act_text, 10)
-#print (score1)
-#pdb.set_trace()
-score2 = calc_sentence_similarity(electricity_act_text, climate_act_text, 10)
-#print (score1)
-#print (score2)
-pkl.dump(score1, open("savesamescore.p", "wb"))
-pkl.dump(score2, open("savediffscore.p", "wb"))
-fig, ax = plt.subplots()
-for a in [list(score1.values()), list(score2.values())]:
-    sns.distplot(a, ax=ax, kde=False)
-ax.set_xlim([0, 1])
-plt.show()
-pdb.set_trace()
+    #get all the text from climate act
+    page2 = requests.get("https://www.ontario.ca/laws/statute/16c07")
+    all_data2 = datascraping(page2)
+    corpus2 = remove_html_tags(all_data2, to_be_removed)
+    print (count_words(corpus2, words))
+    climate_act_text = get_textbody_per_page(corpus2)
+    cleaned_climate_act_text = preprocessing(climate_act_text)
 
 
-#TODO clean up french parts
+    #calculate similarity between each sentence in electricity act
+    score1 = calc_sentence_similarity(cleaned_electricity_act_text, cleaned_electricity_act_text, 10)
+    #print (score1)
+    #pdb.set_trace()
+    score2 = calc_sentence_similarity(electricity_act_text, climate_act_text, 10)
+    #print (score1)
+    #print (score2)
+    pkl.dump(score1, open("savesamescore.p", "wb"))
+    pkl.dump(score2, open("savediffscore.p", "wb"))
+    fig, ax = plt.subplots()
+    for a in [list(score1.values()), list(score2.values())]:
+        sns.distplot(a, ax=ax, kde=False)
+    ax.set_xlim([0, 1])
+    plt.show()
+    pdb.set_trace()
+
+
+    #TODO clean up french parts
 
