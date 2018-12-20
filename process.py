@@ -110,17 +110,17 @@ if __name__ == "__main__":
 
 
     #calculate similarity between each sentence in electricity act
-    score1 = calc_sentence_similarity(cleaned_electricity_act_text, cleaned_electricity_act_text, 10)
+    score1 = calc_sentence_similarity(cleaned_electricity_act_text, cleaned_electricity_act_text, 20)
     #print (score1)
     #pdb.set_trace()
-    score2 = calc_sentence_similarity(electricity_act_text, climate_act_text, 10)
+    score2 = calc_sentence_similarity(electricity_act_text, climate_act_text, 20)
     #print (score1)
     #print (score2)
     pkl.dump(score1, open("savesamescore.p", "wb"))
     pkl.dump(score2, open("savediffscore.p", "wb"))
     fig, ax = plt.subplots()
-    for a in [list(score1.values()), list(score2.values())]:
-        sns.distplot(a, ax=ax, kde=False)
+    for color, data in zip(['b','r'], [list(score1.values()), list(score2.values())]):
+        sns.distplot(data, ax=ax, kde=False, color=color)
     ax.set_xlim([0, 1])
     plt.show()
     pdb.set_trace()
