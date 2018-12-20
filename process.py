@@ -57,9 +57,8 @@ def calc_sentence_similarity(textbody, textbody2, no_of_sentences = None):#here 
         np.random.shuffle(tmp)
         itr2 = tmp[:no_of_sentences_2]
 
-    for idx1 in tqdm(itr1):  # len(textbody)):
-        for idx2 in itr2:  # len(textbody)):
-            # similarity_score.append(nlp(textbody[idx1]).similarity(nlp(textbody[idx2])))
+    for idx1 in tqdm(itr1):
+        for idx2 in itr2:
             similarity_score[(idx1, idx2)] = nlp(textbody[idx1]).similarity(nlp(textbody2[idx2]))
     return similarity_score
 
@@ -87,40 +86,32 @@ def preprocessing(text):
     return tokenized_sents #this is the processed list of text from an html page
 
 
-
-if __name__ == "__main__":
-    #get all the text from electricity act
-    page = requests.get("https://www.ontario.ca/laws/statute/98e15#BK1")
+def helper1(url):
+    page = requests.get(url)
     to_be_removed = re.compile('<.*?>')
     all_data = datascraping(page)
     corpus = remove_html_tags(all_data, to_be_removed)
     words = ['comply', 'shall', 'must', 'oblige']
     print (count_words(corpus, words))
     electricity_act_text = get_textbody_per_page(corpus)
-    #pdb.set_trace()
-    cleaned_electricity_act_text = preprocessing(electricity_act_text)
+    return electricity_act_text, preprocessing(electricity_act_text)
 
-    #get all the text from climate act
-    page2 = requests.get("https://www.ontario.ca/laws/statute/16c07")
-    all_data2 = datascraping(page2)
-    corpus2 = remove_html_tags(all_data2, to_be_removed)
-    print (count_words(corpus2, words))
-    climate_act_text = get_textbody_per_page(corpus2)
-    cleaned_climate_act_text = preprocessing(climate_act_text)
+
+if __name__ == "__main__":
+    electricity_text, cleaned_electricity_text = helper1("https://www.ontario.ca/laws/statute/98e15#BK1")
+    climate_text, cleaned_climate_text = helper1("https://www.ontario.ca/laws/statute/16c07")
 
 
     #calculate similarity between each sentence in electricity act
-    score1 = calc_sentence_similarity(cleaned_electricity_act_text, cleaned_electricity_act_text, 10)
-    #print (score1)
-    #pdb.set_trace()
-    score2 = calc_sentence_similarity(electricity_act_text, climate_act_text, 10)
-    #print (score1)
-    #print (score2)
-    pkl.dump(score1, open("savesamescore.p", "wb"))
-    pkl.dump(score2, open("savediffscore.p", "wb"))
+    score1 = calc_sentence_similarity(electricity_text, electricity_text, 50)
+    score2 = calc_sentence_similarity(electricity_text, climate_text, 50)
+    score3 = calc_sentence_similarity(climate_text, climate_text, 50)
+    pkl.dump(score1, open("e_e.p", "wb"))
+    pkl.dump(score2, open("e_c.p", "wb"))
+    pkl.dump(score3, open("c_c.p", "wb"))
     fig, ax = plt.subplots()
-    for a in [list(score1.values()), list(score2.values())]:
-        sns.distplot(a, ax=ax, kde=False)
+    for color, data in zip(['r', 'g', 'b'], [list(score1.values()), list(score2.values()), list(score3.values())]):
+        sns.distplot(data, ax=ax, kde=False, color=color)
     ax.set_xlim([0, 1])
     plt.show()
     pdb.set_trace()
