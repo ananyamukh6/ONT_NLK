@@ -103,9 +103,9 @@ if __name__ == "__main__":
 
 
     #calculate similarity between each sentence in electricity act
-    score1 = calc_sentence_similarity(cleaned_electricity_text, cleaned_electricity_text, 20)
-    score2 = calc_sentence_similarity(cleaned_electricity_text, cleaned_climate_text, 20)
-    score3 = calc_sentence_similarity(cleaned_climate_text, cleaned_climate_text, 20)
+    score1 = calc_sentence_similarity(electricity_text, electricity_text, 50)
+    score2 = calc_sentence_similarity(electricity_text, climate_text, 50)
+    score3 = calc_sentence_similarity(climate_text, climate_text, 50)
     pkl.dump(score1, open("e_e.p", "wb"))
     pkl.dump(score2, open("e_c.p", "wb"))
     pkl.dump(score3, open("c_c.p", "wb"))
